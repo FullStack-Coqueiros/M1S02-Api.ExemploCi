@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-
+    name: Compilacao e Test
     runs-on: ubuntu-latest
 
     steps:
