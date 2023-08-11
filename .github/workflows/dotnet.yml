@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Compilacao e Test
+    name: Compilacao e Test CI
     runs-on: ubuntu-latest
 
     steps:
@@ -35,3 +35,21 @@ jobs:
         path: "**/test-results.trx"                            
         reporter: dotnet-trx
         fail-on-error: true
+
+  cd:
+    name : CD - Deploy Docker hub'
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: vitorlassen
+          password: dckr_pat_19uRxrDpdqwauYrquAV4-9tLh3c 
+      
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags:  vitorlassen/teste-app:latest
+
+        
