@@ -50,6 +50,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags:  vitorlassen/api-coqueiros:latest
+          tags:  ${{vars.DOCKERHUB_REPO}}
 
         
