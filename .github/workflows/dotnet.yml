@@ -1,0 +1,55 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Compilacao e Test CI
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" || true
+    
+    - name: Relatorio de Testes
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: DotNET Tests
+        path: "**/test-results.trx"                            
+        reporter: dotnet-trx
+        fail-on-error: true
+
+  cd:
+    name : CD - Deploy Docker hub'
+    runs-on: ubuntu-latest
+    needs: build
+    steps: 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME}}
+          password: ${{ secrets.DOCKERHUB_TOKEN}}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags:  ${{vars.DOCKERHUB_REPO}}
+
+        
